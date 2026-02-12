@@ -64,7 +64,8 @@ const StaffDashboard = () => {
   const [photoForm, setPhotoForm] = useState({
     site_name: "",
     photo_data: null,
-    description: ""
+    description: "",
+    progress_type: ""
   });
 
   // New site/party form
