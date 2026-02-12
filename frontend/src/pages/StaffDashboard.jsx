@@ -29,10 +29,12 @@ import {
   X,
   CheckCircle2,
   HardHat,
-  Image as ImageIcon
+  Image as ImageIcon,
+  ClipboardList
 } from "lucide-react";
 
 const CATEGORIES = ["M-sand", "Cement", "Steel", "Labour", "Other"];
+const PROGRESS_TYPES = ["Foundation", "Structure", "Plastering", "Painting", "Electrical", "Plumbing", "Other"];
 
 const StaffDashboard = () => {
   const navigate = useNavigate();
