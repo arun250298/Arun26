@@ -1,0 +1,184 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Anti-AI Creative Designer",
+    "principles": [
+      "Fusion over Imitation: Mix construction utility with fintech precision.",
+      "Emotion First: The app must feel 'Solid', 'Reliable', and 'Fast'.",
+      "Content is King: Data clarity over decoration. Every pixel must serve the site engineer.",
+      "Zoom in: Focus on the specific task (e.g., uploading a bill) with zero distraction.",
+      "Contrast: High contrast for outdoor visibility (Sunlight readability)."
+    ]
+  },
+  "context": {
+    "app_name": "Dhaya Promoters and Builders Site Manager",
+    "app_type": "Mobile-First Utility & Dashboard",
+    "theme_strategy": "light_mode_primary",
+    "emotional_tone": "Industrial, Trustworthy, Efficient, Rugged",
+    "target_audience": {
+      "primary": "Site Supervisors (Mobile, Field, Non-tech savvy)",
+      "secondary": "Admins/Owners (Desktop/Tablet, Data-focused)"
+    }
+  },
+  "colors": {
+    "palette_name": "Structural Integrity",
+    "primary": {
+      "DEFAULT": "#0F172A",
+      "foreground": "#F8FAFC",
+      "description": "Deep Slate/Navy. Used for Headers, Primary Text, Strong Brand elements."
+    },
+    "secondary": {
+      "DEFAULT": "#F1F5F9",
+      "foreground": "#0F172A",
+      "description": "Concrete Grey. Used for backgrounds, card fills."
+    },
+    "accent": {
+      "DEFAULT": "#F97316",
+      "foreground": "#FFFFFF",
+      "description": "Safety Orange. Used for CTAs, Alerts, Active States, 'Add Bill' buttons."
+    },
+    "neutral": {
+      "background": "#FFFFFF",
+      "surface": "#F8FAFC",
+      "border": "#E2E8F0",
+      "text_primary": "#0F172A",
+      "text_secondary": "#64748B"
+    },
+    "status": {
+      "success": "#16A34A",
+      "warning": "#EAB308",
+      "error": "#DC2626",
+      "info": "#0284C7"
+    },
+    "gradients": {
+      "brand": "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+      "accent_shine": "linear-gradient(45deg, #F97316, #FB923C)"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": {
+        "family": "Manrope",
+        "weights": ["600", "700", "800"],
+        "fallback": "sans-serif"
+      },
+      "body": {
+        "family": "Public Sans",
+        "weights": ["400", "500", "600"],
+        "fallback": "system-ui"
+      },
+      "mono": {
+        "family": "JetBrains Mono",
+        "weights": ["400"],
+        "fallback": "monospace"
+      }
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl font-extrabold tracking-tight",
+      "h2": "text-3xl font-bold tracking-tight",
+      "h3": "text-2xl font-semibold tracking-normal",
+      "body_lg": "text-lg leading-relaxed",
+      "body_base": "text-base leading-relaxed text-slate-600",
+      "caption": "text-sm font-medium text-slate-500 uppercase tracking-wider"
+    },
+    "instructions": "Import 'Manrope' and 'Public Sans' from Google Fonts. Use Manrope for all Headings and Price/Amount numerals. Use Public Sans for labels, body text, and inputs."
+  },
+  "layout": {
+    "grid_system": {
+      "mobile": "grid-cols-1 gap-4",
+      "tablet": "grid-cols-2 gap-6",
+      "desktop": "grid-cols-12 gap-8"
+    },
+    "spacing": {
+      "container_padding": "p-4 md:p-8 lg:p-12",
+      "section_gap": "gap-8 md:gap-12",
+      "component_gap": "gap-4"
+    },
+    "containers": {
+      "mobile_card": "bg-white rounded-xl border border-slate-200 p-5 shadow-sm",
+      "dashboard_panel": "bg-white rounded-2xl border border-slate-200 p-6 shadow-sm h-full"
+    },
+    "strategies": {
+      "mobile_first": "Inputs must be 48px+ height. Buttons must be full width on mobile. Navigation must be bottom-fixed for staff.",
+      "bento_grid": "Use for Admin Dashboard. Mix 1x1 (stats) and 2x2 (charts) blocks."
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 h-12 rounded-lg font-bold shadow-md active:scale-95 transition-all",
+      "accent": "bg-accent text-accent-foreground hover:bg-accent/90 h-12 rounded-lg font-bold shadow-md active:scale-95 transition-all",
+      "outline": "border-2 border-slate-200 bg-transparent hover:bg-slate-50 text-slate-900 h-12 rounded-lg font-semibold transition-colors",
+      "ghost": "hover:bg-slate-100 text-slate-700 font-medium"
+    },
+    "inputs": {
+      "base": "h-12 bg-slate-50 border border-slate-200 rounded-lg px-4 text-base focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-slate-400",
+      "file_upload": "border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors p-8 text-center cursor-pointer flex flex-col items-center justify-center gap-2"
+    },
+    "cards": {
+      "bill_card": "relative overflow-hidden bg-white border border-slate-200 rounded-xl p-4 hover:border-primary/50 transition-colors",
+      "stat_card": "bg-white border border-slate-100 rounded-2xl p-6 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)] flex flex-col justify-between"
+    },
+    "navigation": {
+      "mobile_bottom_bar": "fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 h-16 flex items-center justify-around z-50 pb-safe",
+      "sidebar": "hidden md:flex flex-col w-64 border-r border-slate-200 bg-slate-50/50 h-screen sticky top-0"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": {
+      "soft": "0 4px 20px -2px rgba(15, 23, 42, 0.05)",
+      "lifted": "0 10px 40px -10px rgba(15, 23, 42, 0.1)"
+    },
+    "borders": {
+      "subtle": "1px solid #E2E8F0",
+      "active": "1px solid #0F172A"
+    },
+    "radius": {
+      "default": "0.75rem",
+      "button": "0.5rem"
+    }
+  },
+  "assets": {
+    "icons": {
+      "library": "lucide-react",
+      "style": "stroke-width: 2px; size: 20px or 24px",
+      "usage": "Use specifically: 'HardHat', 'Hammer', 'Receipt', 'Camera', 'ClipboardList', 'LayoutDashboard', 'Users', 'TrendingUp'"
+    },
+    "images": [
+      {
+        "category": "hero_bg",
+        "url": "https://images.unsplash.com/photo-1593630987785-98139c5f3cc6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHwzfHxjb25zdHJ1Y3Rpb24lMjBzaXRlJTIwYnVpbGRpbmclMjBzdHJ1Y3R1cmV8ZW58MHx8fHwxNzcwODc5OTQzfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Construction structure for Login/Landing background"
+      },
+      {
+        "category": "empty_state",
+        "url": "https://images.unsplash.com/photo-1768158988512-ad31657fe5b8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHwxfHxjb25zdHJ1Y3Rpb24lMjB3b3JrZXIlMjBoZWxtZXQlMjB0YWJsZXR8ZW58MHx8fHwxNzcwODc5OTQ0fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Hard hat and tools for empty list states"
+      }
+    ]
+  },
+  "universal_guidelines": {
+    "do": [
+      "Use 'sonner' for all toast notifications.",
+      "Use 'Shadcn UI' components but override the radius to 'rounded-lg' or 'rounded-xl' to look modern.",
+      "Ensure all 'Add Bill' forms have massive hit areas.",
+      "Always show 'Pending Balance' in RED or ORANGE text if overdue.",
+      "Use 'data-testid' on all interactive elements.",
+      "For PDF generation, keep the layout white, simple, and tabular."
+    ],
+    "dont": [
+      "Do NOT use gradients on text. It reduces readability outdoors.",
+      "Do NOT use 'Inter' font. Use Manrope/Public Sans.",
+      "Do NOT use complex animations. Speed is key for field staff.",
+      "Do NOT use dark mode as default for the Staff App (Sunlight issue)."
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Install 'lucide-react' and 'recharts' if not present.",
+    "Install 'sonner' for toasts.",
+    "Setup Google Fonts: Manrope (400,600,700) and Public Sans (400,500,600).",
+    "Create a 'Layout' component that handles the Mobile Navigation (Staff) vs Sidebar (Admin) logic based on user role.",
+    "The 'Bill Entry' page must be the Home Screen for Staff users.",
+    "The 'Dashboard' page must be the Home Screen for Admin users.",
+    "Implement 'react-pdf' or similar for the Daily Report PDF generation."
+  ]
+}
