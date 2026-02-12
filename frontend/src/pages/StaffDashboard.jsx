@@ -214,7 +214,7 @@ const StaffDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
+    <div className="min-h-screen bg-slate-50 pb-32">
       {/* Header */}
       <header className="bg-slate-900 text-white px-4 py-4 sticky top-0 z-40">
         <div className="flex items-center justify-between">
