@@ -126,8 +126,33 @@ class SitePhotoCreate(BaseModel):
 class SiteCreate(BaseModel):
     name: str
 
+class SiteUpdate(BaseModel):
+    name: Optional[str] = None
+    address: Optional[str] = None
+    status: Optional[str] = None  # active, completed, on_hold
+
 class PartyCreate(BaseModel):
     name: str
+
+class DailyUpdateCreate(BaseModel):
+    site_name: str
+    work_description: str
+    progress_percentage: Optional[int] = None
+    issues: Optional[str] = None
+    photo_data: Optional[str] = None
+
+class DailyUpdateBase(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    update_id: str
+    user_id: str
+    user_name: str
+    site_name: str
+    work_description: str
+    progress_percentage: Optional[int] = None
+    issues: Optional[str] = None
+    photo_data: Optional[str] = None
+    check_in_time: datetime
+    created_at: datetime
 
 # ==================== AUTH HELPERS ====================
 
