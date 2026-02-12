@@ -4,6 +4,9 @@ import axios from "axios";
 import { toast } from "sonner";
 import { AuthContext, API } from "../App";
 import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -31,8 +34,12 @@ import {
   Trash2,
   Image as ImageIcon,
   X,
-  ZoomIn
+  ZoomIn,
+  Plus,
+  Upload
 } from "lucide-react";
+
+const PROGRESS_TYPES = ["Foundation", "Structure", "Plastering", "Painting", "Electrical", "Plumbing", "Other"];
 
 const SitePhotosPage = () => {
   const navigate = useNavigate();
@@ -42,6 +49,17 @@ const SitePhotosPage = () => {
   const [loading, setLoading] = useState(true);
   const [filterSite, setFilterSite] = useState("");
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isAddSiteOpen, setIsAddSiteOpen] = useState(false);
+  const [newSiteName, setNewSiteName] = useState("");
+  
+  // Photo form state
+  const [photoForm, setPhotoForm] = useState({
+    site_name: "",
+    photo_data: null,
+    description: "",
+    progress_type: ""
+  });
 
   useEffect(() => {
     loadData();
@@ -85,6 +103,65 @@ const SitePhotosPage = () => {
       loadData();
     } catch (error) {
       toast.error("Failed to delete photo");
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoForm({ ...photoForm, photo_data: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadPhoto = async () => {
+    if (!photoForm.site_name || !photoForm.photo_data) {
+      toast.error("Please select a site and upload a photo");
+      return;
+    }
+
+    try {
+      const fullDescription = photoForm.progress_type 
+        ? `[${photoForm.progress_type}] ${photoForm.description || ''}`.trim()
+        : photoForm.description;
+
+      await axios.post(`${API}/site-photos`, {
+        site_name: photoForm.site_name,
+        photo_data: photoForm.photo_data,
+        description: fullDescription
+      }, { withCredentials: true });
+
+      toast.success("Photo uploaded successfully!");
+      setIsUploadOpen(false);
+      setPhotoForm({
+        site_name: "",
+        photo_data: null,
+        description: "",
+        progress_type: ""
+      });
+      loadData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to upload photo");
+    }
+  };
+
+  const handleAddSite = async () => {
+    if (!newSiteName.trim()) {
+      toast.error("Please enter a site name");
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/sites`, { name: newSiteName.trim() }, { withCredentials: true });
+      toast.success("Site added!");
+      setNewSiteName("");
+      setIsAddSiteOpen(false);
+      loadData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to add site");
     }
   };
 
@@ -162,9 +239,17 @@ const SitePhotosPage = () => {
           {/* Page Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 hidden md:block">Site Photos</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 hidden md:block">Site Photos & Work Progress</h1>
               <p className="text-slate-500 hidden md:block">{photos.length} total photos</p>
             </div>
+            <Button
+              onClick={() => setIsUploadOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              data-testid="admin-upload-photo-btn"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Upload Photo
+            </Button>
           </div>
 
           {/* Filter */}
@@ -205,7 +290,14 @@ const SitePhotosPage = () => {
             <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
               <Camera className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-2">No photos found</h3>
-              <p className="text-slate-500">Photos uploaded by staff will appear here</p>
+              <p className="text-slate-500 mb-4">Upload site photos and work progress</p>
+              <Button
+                onClick={() => setIsUploadOpen(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Camera className="w-4 h-4 mr-2" />
+                Upload First Photo
+              </Button>
             </div>
           ) : (
             <div className="space-y-8">
@@ -231,6 +323,12 @@ const SitePhotosPage = () => {
                               <ImageIcon className="w-10 h-10 text-slate-300" />
                             </div>
                           )}
+                          {/* Progress type badge */}
+                          {photo.description?.startsWith('[') && (
+                            <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                              {photo.description.split(']')[0].replace('[', '')}
+                            </span>
+                          )}
                           {/* Overlay on hover */}
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             <Button
@@ -254,7 +352,11 @@ const SitePhotosPage = () => {
                         <div className="p-3">
                           <p className="font-medium text-slate-900 text-sm truncate">{photo.site_name}</p>
                           {photo.description && (
-                            <p className="text-xs text-slate-500 truncate">{photo.description}</p>
+                            <p className="text-xs text-slate-500 truncate">
+                              {photo.description.includes(']') 
+                                ? photo.description.split(']')[1].trim() || photo.description.split(']')[0].replace('[', '')
+                                : photo.description}
+                            </p>
                           )}
                           <p className="text-xs text-slate-400 mt-1">
                             {new Date(photo.uploaded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -299,6 +401,177 @@ const SitePhotosPage = () => {
               </p>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload Photo Dialog */}
+      <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+        <DialogContent className="max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Camera className="w-5 h-5 text-blue-500" />
+              Upload Site Photo / Work Progress
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Site Name */}
+            <div>
+              <Label className="text-slate-700 mb-2 block">Site Name *</Label>
+              <div className="flex gap-2">
+                <Select
+                  value={photoForm.site_name}
+                  onValueChange={(v) => setPhotoForm({ ...photoForm, site_name: v })}
+                >
+                  <SelectTrigger className="flex-1 h-12" data-testid="admin-photo-site-select">
+                    <SelectValue placeholder="Select site" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sites.map((site) => (
+                      <SelectItem key={site.site_id || site.name} value={site.name}>
+                        {site.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsAddSiteOpen(true)}
+                  className="h-12 w-12"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Progress Type */}
+            <div>
+              <Label className="text-slate-700 mb-2 block">Work Progress Type</Label>
+              <Select
+                value={photoForm.progress_type}
+                onValueChange={(v) => setPhotoForm({ ...photoForm, progress_type: v })}
+              >
+                <SelectTrigger className="h-12" data-testid="admin-photo-progress-type">
+                  <SelectValue placeholder="Select progress type (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROGRESS_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Photo */}
+            <div>
+              <Label className="text-slate-700 mb-2 block">Photo *</Label>
+              <div className="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors p-8 text-center cursor-pointer relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleFileChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  data-testid="admin-photo-file-input"
+                />
+                {photoForm.photo_data ? (
+                  <div className="relative">
+                    <img
+                      src={photoForm.photo_data}
+                      alt="Site"
+                      className="max-h-48 mx-auto rounded-lg"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPhotoForm({ ...photoForm, photo_data: null });
+                      }}
+                      className="absolute top-0 right-0 bg-white rounded-full shadow"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500">Tap to capture or upload photo</p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Description */}
+            <div>
+              <Label className="text-slate-700 mb-2 block">Description (Optional)</Label>
+              <Textarea
+                placeholder="Describe what's in the photo..."
+                value={photoForm.description}
+                onChange={(e) => setPhotoForm({ ...photoForm, description: e.target.value })}
+                className="resize-none"
+                rows={2}
+                data-testid="admin-photo-description-input"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsUploadOpen(false);
+                setPhotoForm({ site_name: "", photo_data: null, description: "", progress_type: "" });
+              }}
+              className="flex-1 h-12"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUploadPhoto}
+              className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white"
+              data-testid="admin-submit-photo-btn"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Upload Photo
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Site Dialog */}
+      <Dialog open={isAddSiteOpen} onOpenChange={setIsAddSiteOpen}>
+        <DialogContent className="max-w-sm mx-4">
+          <DialogHeader>
+            <DialogTitle>Add New Site</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Label className="text-slate-700 mb-2 block">Site Name</Label>
+            <Input
+              placeholder="Enter site name"
+              value={newSiteName}
+              onChange={(e) => setNewSiteName(e.target.value)}
+              className="h-12"
+              data-testid="admin-new-site-input"
+            />
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => setIsAddSiteOpen(false)} className="flex-1">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddSite}
+              className="flex-1 bg-slate-900 hover:bg-slate-800 text-white"
+              data-testid="admin-submit-site-btn"
+            >
+              Add Site
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
