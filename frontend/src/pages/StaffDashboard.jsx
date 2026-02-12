@@ -350,7 +350,7 @@ const StaffDashboard = () => {
         {activeTab === "photos" && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-slate-900">Site Photos</h3>
+              <h3 className="font-bold text-slate-900">Site Photos & Work Progress</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -358,20 +358,22 @@ const StaffDashboard = () => {
                 data-testid="add-photo-btn"
                 className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
               >
-                <Plus className="w-4 h-4 mr-1" /> Upload Photo
+                <Plus className="w-4 h-4 mr-1" /> Upload
               </Button>
             </div>
 
             {todayPhotos.length === 0 ? (
               <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
                 <Camera className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500">No photos uploaded today</p>
+                <p className="text-slate-500 mb-2">No photos uploaded today</p>
+                <p className="text-sm text-slate-400 mb-4">Upload site photos and work progress</p>
                 <Button
                   onClick={() => setIsAddPhotoOpen(true)}
-                  className="mt-4 bg-blue-500 hover:bg-blue-600 text-white"
+                  className="bg-blue-500 hover:bg-blue-600 text-white"
                   data-testid="add-first-photo-btn"
                 >
-                  Upload First Photo
+                  <Camera className="w-4 h-4 mr-2" />
+                  Upload Photo
                 </Button>
               </div>
             ) : (
@@ -382,7 +384,7 @@ const StaffDashboard = () => {
                     className="bg-white rounded-xl border border-slate-200 overflow-hidden"
                     data-testid={`photo-card-${photo.photo_id}`}
                   >
-                    <div className="aspect-square bg-slate-100">
+                    <div className="aspect-square bg-slate-100 relative">
                       {photo.photo_data ? (
                         <img
                           src={photo.photo_data}
@@ -394,11 +396,21 @@ const StaffDashboard = () => {
                           <ImageIcon className="w-8 h-8 text-slate-300" />
                         </div>
                       )}
+                      {/* Progress type badge */}
+                      {photo.description?.startsWith('[') && (
+                        <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                          {photo.description.split(']')[0].replace('[', '')}
+                        </span>
+                      )}
                     </div>
                     <div className="p-3">
                       <p className="font-medium text-slate-900 text-sm truncate">{photo.site_name}</p>
                       {photo.description && (
-                        <p className="text-xs text-slate-500 truncate">{photo.description}</p>
+                        <p className="text-xs text-slate-500 truncate">
+                          {photo.description.includes(']') 
+                            ? photo.description.split(']')[1].trim() || photo.description.split(']')[0].replace('[', '')
+                            : photo.description}
+                        </p>
                       )}
                     </div>
                   </div>
