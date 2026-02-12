@@ -12,8 +12,8 @@ BACKEND_URL = "https://contractor-bill-mgmt.preview.emergentagent.com"
 API_URL = f"{BACKEND_URL}/api"
 
 class ConstructionAppTester:
-    def __init__(self):
-        self.session_token = None
+    def __init__(self, session_token=None):
+        self.session_token = session_token or "test_session_1770881113869"
         self.user_id = None
         self.test_site_id = None
         self.test_party_id = None  
