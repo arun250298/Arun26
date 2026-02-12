@@ -259,14 +259,14 @@ const BillsPage = () => {
                 <div>
                   <Label className="mb-2 block text-sm">Site</Label>
                   <Select
-                    value={filters.site_name}
-                    onValueChange={(v) => setFilters({ ...filters, site_name: v })}
+                    value={filters.site_name || "all"}
+                    onValueChange={(v) => setFilters({ ...filters, site_name: v === "all" ? "" : v })}
                   >
                     <SelectTrigger data-testid="filter-site">
                       <SelectValue placeholder="All Sites" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Sites</SelectItem>
+                      <SelectItem value="all">All Sites</SelectItem>
                       {sites.map((site) => (
                         <SelectItem key={site.site_id || site.name} value={site.name}>
                           {site.name}
@@ -278,14 +278,14 @@ const BillsPage = () => {
                 <div>
                   <Label className="mb-2 block text-sm">Party</Label>
                   <Select
-                    value={filters.party_name}
-                    onValueChange={(v) => setFilters({ ...filters, party_name: v })}
+                    value={filters.party_name || "all"}
+                    onValueChange={(v) => setFilters({ ...filters, party_name: v === "all" ? "" : v })}
                   >
                     <SelectTrigger data-testid="filter-party">
                       <SelectValue placeholder="All Parties" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Parties</SelectItem>
+                      <SelectItem value="all">All Parties</SelectItem>
                       {parties.map((party) => (
                         <SelectItem key={party.party_id || party.name} value={party.name}>
                           {party.name}
@@ -297,14 +297,14 @@ const BillsPage = () => {
                 <div>
                   <Label className="mb-2 block text-sm">Category</Label>
                   <Select
-                    value={filters.category}
-                    onValueChange={(v) => setFilters({ ...filters, category: v })}
+                    value={filters.category || "all"}
+                    onValueChange={(v) => setFilters({ ...filters, category: v === "all" ? "" : v })}
                   >
                     <SelectTrigger data-testid="filter-category">
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Categories</SelectItem>
+                      <SelectItem value="all">All Categories</SelectItem>
                       {CATEGORIES.map((cat) => (
                         <SelectItem key={cat} value={cat}>
                           {cat}
@@ -316,8 +316,8 @@ const BillsPage = () => {
                 <div>
                   <Label className="mb-2 block text-sm">Status</Label>
                   <Select
-                    value={filters.status}
-                    onValueChange={(v) => setFilters({ ...filters, status: v })}
+                    value={filters.status || "all"}
+                    onValueChange={(v) => setFilters({ ...filters, status: v === "all" ? "" : v })}
                   >
                     <SelectTrigger data-testid="filter-status">
                       <SelectValue placeholder="All Statuses" />
