@@ -257,14 +257,14 @@ const SitePhotosPage = () => {
             <div className="flex items-center gap-4">
               <Filter className="w-5 h-5 text-slate-400" />
               <Select
-                value={filterSite}
-                onValueChange={setFilterSite}
+                value={filterSite || "all"}
+                onValueChange={(v) => setFilterSite(v === "all" ? "" : v)}
               >
                 <SelectTrigger className="w-full md:w-64" data-testid="filter-site-photos">
                   <SelectValue placeholder="Filter by site" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Sites</SelectItem>
+                  <SelectItem value="all">All Sites</SelectItem>
                   {sites.map((site) => (
                     <SelectItem key={site.site_id || site.name} value={site.name}>
                       {site.name}
