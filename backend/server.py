@@ -337,7 +337,7 @@ async def get_users(admin: UserBase = Depends(require_admin)):
 
 @api_router.get("/sites")
 async def get_sites(user: UserBase = Depends(get_current_user)):
-    """Get all site names"""
+    """Get all sites"""
     sites = await db.sites.find({}, {"_id": 0}).to_list(1000)
     return sites
 
@@ -351,10 +351,44 @@ async def create_site(site: SiteCreate, user: UserBase = Depends(get_current_use
     site_doc = {
         "site_id": f"site_{uuid.uuid4().hex[:12]}",
         "name": site.name,
+        "address": "",
+        "status": "active",
+        "created_by": user.user_id,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.sites.insert_one(site_doc)
-    return {"site_id": site_doc["site_id"], "name": site.name}
+    site_doc.pop('_id', None)
+    return site_doc
+
+@api_router.get("/sites/{site_id}")
+async def get_site(site_id: str, user: UserBase = Depends(get_current_user)):
+    """Get single site"""
+    site = await db.sites.find_one({"site_id": site_id}, {"_id": 0})
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+    return site
+
+@api_router.put("/sites/{site_id}")
+async def update_site(site_id: str, site_update: SiteUpdate, admin: UserBase = Depends(require_admin)):
+    """Update a site (admin only)"""
+    existing = await db.sites.find_one({"site_id": site_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Site not found")
+    
+    update_data = {k: v for k, v in site_update.model_dump().items() if v is not None}
+    if update_data:
+        await db.sites.update_one({"site_id": site_id}, {"$set": update_data})
+    
+    updated_site = await db.sites.find_one({"site_id": site_id}, {"_id": 0})
+    return updated_site
+
+@api_router.delete("/sites/{site_id}")
+async def delete_site(site_id: str, admin: UserBase = Depends(require_admin)):
+    """Delete a site (admin only)"""
+    result = await db.sites.delete_one({"site_id": site_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Site not found")
+    return {"message": "Site deleted"}
 
 @api_router.get("/parties")
 async def get_parties(user: UserBase = Depends(get_current_user)):
@@ -376,6 +410,133 @@ async def create_party(party: PartyCreate, user: UserBase = Depends(get_current_
     }
     await db.parties.insert_one(party_doc)
     return {"party_id": party_doc["party_id"], "name": party.name}
+
+# ==================== DAILY UPDATES ====================
+
+@api_router.get("/daily-updates")
+async def get_daily_updates(
+    user: UserBase = Depends(get_current_user),
+    site_name: Optional[str] = None,
+    date: Optional[str] = None,
+    user_id: Optional[str] = None
+):
+    """Get daily updates with filters"""
+    query = {}
+    
+    if site_name:
+        query["site_name"] = site_name
+    if user_id:
+        query["user_id"] = user_id
+    if date:
+        # Filter by date (same day)
+        start = datetime.fromisoformat(date).replace(hour=0, minute=0, second=0)
+        end = start + timedelta(days=1)
+        query["created_at"] = {
+            "$gte": start.isoformat(),
+            "$lt": end.isoformat()
+        }
+    
+    updates = await db.daily_updates.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    for update in updates:
+        for field in ['check_in_time', 'created_at']:
+            if isinstance(update.get(field), str):
+                update[field] = datetime.fromisoformat(update[field])
+    
+    return updates
+
+@api_router.get("/daily-updates/today")
+async def get_today_updates(user: UserBase = Depends(get_current_user)):
+    """Get today's updates for the current user"""
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+    
+    updates = await db.daily_updates.find({
+        "user_id": user.user_id,
+        "created_at": {"$gte": today_start}
+    }, {"_id": 0}).to_list(100)
+    
+    return updates
+
+@api_router.post("/daily-updates")
+async def create_daily_update(
+    update: DailyUpdateCreate,
+    user: UserBase = Depends(get_current_user)
+):
+    """Create a daily work update"""
+    now = datetime.now(timezone.utc)
+    
+    update_doc = {
+        "update_id": f"update_{uuid.uuid4().hex[:12]}",
+        "user_id": user.user_id,
+        "user_name": user.name,
+        "site_name": update.site_name,
+        "work_description": update.work_description,
+        "progress_percentage": update.progress_percentage,
+        "issues": update.issues,
+        "photo_data": update.photo_data,
+        "check_in_time": now.isoformat(),
+        "created_at": now.isoformat()
+    }
+    
+    await db.daily_updates.insert_one(update_doc)
+    
+    # Auto-create site if not exists
+    if not await db.sites.find_one({"name": update.site_name}):
+        await db.sites.insert_one({
+            "site_id": f"site_{uuid.uuid4().hex[:12]}",
+            "name": update.site_name,
+            "status": "active",
+            "created_at": now.isoformat()
+        })
+    
+    update_doc.pop('_id', None)
+    return update_doc
+
+@api_router.get("/daily-updates/summary")
+async def get_daily_updates_summary(
+    admin: UserBase = Depends(require_admin),
+    date: Optional[str] = None
+):
+    """Get summary of daily updates (admin only)"""
+    target_date = datetime.fromisoformat(date) if date else datetime.now(timezone.utc)
+    start = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = start + timedelta(days=1)
+    
+    # Get updates for the day
+    updates = await db.daily_updates.find({
+        "created_at": {"$gte": start.isoformat(), "$lt": end.isoformat()}
+    }, {"_id": 0}).to_list(1000)
+    
+    # Group by site
+    by_site = {}
+    for update in updates:
+        site = update.get("site_name", "Unknown")
+        if site not in by_site:
+            by_site[site] = []
+        by_site[site].append(update)
+    
+    # Group by user
+    by_user = {}
+    for update in updates:
+        user_name = update.get("user_name", "Unknown")
+        if user_name not in by_user:
+            by_user[user_name] = []
+        by_user[user_name].append(update)
+    
+    # Get users who haven't submitted updates today
+    all_staff = await db.users.find({"role": "staff"}, {"_id": 0}).to_list(1000)
+    submitted_user_ids = set(u.get("user_id") for u in updates)
+    pending_users = [u for u in all_staff if u.get("user_id") not in submitted_user_ids]
+    
+    return {
+        "date": target_date.isoformat(),
+        "total_updates": len(updates),
+        "by_site": [{"site": k, "updates": v, "count": len(v)} for k, v in by_site.items()],
+        "by_user": [{"user": k, "updates": v, "count": len(v)} for k, v in by_user.items()],
+        "pending_users": pending_users,
+        "staff_submitted": len(by_user),
+        "staff_pending": len(pending_users)
+    }
 
 # ==================== BILLS ====================
 
