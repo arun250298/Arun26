@@ -388,11 +388,15 @@ print('Test data cleaned up');
         """Run all backend tests"""
         print("🚀 Starting Construction Site Expense Tracker API Tests")
         print(f"🎯 Target: {API_URL}")
+        print(f"🎫 Using session token: {self.session_token}")
         
-        # Setup
-        if not self.setup_test_user_and_session():
-            print("❌ Failed to setup test environment")
-            return False
+        # Setup - skip if session token provided
+        if not self.session_token.startswith("test_session_1770881113869"):
+            if not self.setup_test_user_and_session():
+                print("❌ Failed to setup test environment")
+                return False
+        else:
+            print("✅ Using existing session token from main agent")
         
         # Basic connectivity tests
         print("\n📡 Testing Basic Connectivity...")
