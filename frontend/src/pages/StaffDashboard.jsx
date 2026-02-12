@@ -159,14 +159,24 @@ const StaffDashboard = () => {
     }
 
     try {
-      await axios.post(`${API}/site-photos`, photoForm, { withCredentials: true });
+      // Combine progress type with description
+      const fullDescription = photoForm.progress_type 
+        ? `[${photoForm.progress_type}] ${photoForm.description || ''}`.trim()
+        : photoForm.description;
+
+      await axios.post(`${API}/site-photos`, {
+        site_name: photoForm.site_name,
+        photo_data: photoForm.photo_data,
+        description: fullDescription
+      }, { withCredentials: true });
 
       toast.success("Photo uploaded successfully!");
       setIsAddPhotoOpen(false);
       setPhotoForm({
         site_name: "",
         photo_data: null,
-        description: ""
+        description: "",
+        progress_type: ""
       });
       loadInitialData();
     } catch (error) {
