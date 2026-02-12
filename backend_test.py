@@ -442,7 +442,8 @@ print('Test data cleaned up');
         return success_rate >= 80
 
 def main():
-    tester = ConstructionAppTester()
+    # Use provided session token for current testing iteration
+    tester = ConstructionAppTester("test_session_1770881113869")
     success = tester.run_all_tests()
     
     # Exit with appropriate code
