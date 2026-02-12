@@ -625,11 +625,11 @@ const StaffDashboard = () => {
 
       {/* Add Photo Dialog */}
       <Dialog open={isAddPhotoOpen} onOpenChange={setIsAddPhotoOpen}>
-        <DialogContent className="max-w-lg mx-4">
+        <DialogContent className="max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Camera className="w-5 h-5 text-blue-500" />
-              Upload Site Photo
+              Upload Site Photo / Work Progress
             </DialogTitle>
           </DialogHeader>
 
@@ -637,17 +637,48 @@ const StaffDashboard = () => {
             {/* Site Name */}
             <div>
               <Label className="text-slate-700 mb-2 block">Site Name *</Label>
+              <div className="flex gap-2">
+                <Select
+                  value={photoForm.site_name}
+                  onValueChange={(v) => setPhotoForm({ ...photoForm, site_name: v })}
+                >
+                  <SelectTrigger className="flex-1 h-12" data-testid="photo-site-select">
+                    <SelectValue placeholder="Select site" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sites.map((site) => (
+                      <SelectItem key={site.site_id || site.name} value={site.name}>
+                        {site.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsAddSiteOpen(true)}
+                  className="h-12 w-12"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Progress Type */}
+            <div>
+              <Label className="text-slate-700 mb-2 block">Work Progress Type</Label>
               <Select
-                value={photoForm.site_name}
-                onValueChange={(v) => setPhotoForm({ ...photoForm, site_name: v })}
+                value={photoForm.progress_type}
+                onValueChange={(v) => setPhotoForm({ ...photoForm, progress_type: v })}
               >
-                <SelectTrigger className="h-12" data-testid="photo-site-select">
-                  <SelectValue placeholder="Select site" />
+                <SelectTrigger className="h-12" data-testid="photo-progress-type">
+                  <SelectValue placeholder="Select progress type (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {sites.map((site) => (
-                    <SelectItem key={site.site_id || site.name} value={site.name}>
-                      {site.name}
+                  {PROGRESS_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
                     </SelectItem>
                   ))}
                 </SelectContent>
