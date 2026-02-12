@@ -397,8 +397,8 @@ const StaffDashboard = () => {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 bottom-nav-safe">
-        <div className="flex items-center justify-around h-16">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-[9999] shadow-lg" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 20px)' }}>
+        <div className="flex items-center justify-around h-20">
           <button
             onClick={() => setActiveTab("bills")}
             data-testid="nav-bills"
